@@ -1,4 +1,7 @@
 import sys
+import csv
+from datetime import datetime
+import matplotlib.pyplot as plt
 from q2_growth import load_data, show_company, compare_companies
 from q1_layoffs import load_layoffs, get_industries, show_industries
 from q3_comparison import compare_employment
