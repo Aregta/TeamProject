@@ -88,7 +88,9 @@ def show_industries(data, chosen, start, end):
 
     # Create a bar graph
     plt.figure(figsize=(10, 6))
-    plt.bar(names, jobs_cut)
+    bars = plt.bar(names, jobs_cut, width=0.6)
+    plt.bar_label(bars, fmt="{:,.0f}")  # show the number on each bar
+    plt.xlim(-1, len(names))  # keep bars thin when only a few are chosen
 
     plt.title("AI-Related Layoffs by Industry " + str(start) + "-" + str(end))
     plt.xlabel("Industry")
