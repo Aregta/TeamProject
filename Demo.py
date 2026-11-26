@@ -1,6 +1,6 @@
 import sys
 import csv
-
+from q2_growth import load_data, show_company, compare_companies
 def question_1(layoffs_file):
     # Add Q1 here: collect inputs, open/read/close the file, show results.
     pass
