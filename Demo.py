@@ -1,6 +1,7 @@
 import sys
 from q2_growth import load_data, show_company, compare_companies
 from q1_layoffs import load_layoffs, get_industries, show_industries
+from q3_comparison import compare_employment
 
 def question_1(layoffs_file):
     print("\nAI Layoffs by Industry")
@@ -87,8 +88,95 @@ def question_2(staff_file):
 
 
 def question_3(layoffs_file, staff_file):
-    # Add Q3 here: collect inputs, open/read/close both files, show results.
-    pass
+    print("\nAI Layoffs vs Employment Growth")
+
+    try:
+        start = int(input("Enter start year: "))
+        end = int(input("Enter end year: "))
+    except ValueError:
+        print("Please enter valid years.")
+        return
+
+    if start > end:
+        print("Start year cannot be greater than end year.")
+        return
+
+    if start < 2023 or end > 2026:
+        print("Please enter years between 2023 and 2026.")
+        return
+
+    years = list(range(start, end + 1))
+    layoffs = {year: 0 for year in years}
+    staff = {}
+
+    try:
+        with open(layoffs_file, encoding="utf-8-sig") as file:
+            reader = csv.DictReader(file, skipinitialspace=True)
+
+            for row in reader:
+                year = int(row["date"][:4])
+                count = row["employees_affected_exact"].strip()
+
+                if year in layoffs and count:
+                    layoffs[year] += int(count)
+
+        with open(staff_file, encoding="utf-8-sig") as file:
+            reader = csv.DictReader(file, skipinitialspace=True)
+
+            for row in reader:
+                if row["Type"].strip() != "Full company":
+                    continue
+
+                count = row["Staff count"].replace(",", "").strip()
+
+                if not count:
+                    continue
+
+                date = datetime.strptime(row["Date"].strip(), "%m/%d/%Y")
+                key = (row["Company"].strip(), date.year)
+
+                if key not in staff or date > staff[key][0]:
+                    staff[key] = (date, int(float(count)))
+
+    except FileNotFoundError:
+        print("Dataset file not found.")
+        return
+
+    growth = []
+
+    print(f"\n{'Year':<8}{'Layoffs':>12}{'Staff change':>16}")
+
+    for year in years:
+        changes = [
+            staff[(company, year)][1] - staff[(company, year - 1)][1]
+            for company, y in staff
+            if y == year and (company, year - 1) in staff
+        ]
+
+        total = sum(changes) if changes else None
+        growth.append(total)
+
+        shown = f"{total:+,}" if total is not None else "N/A"
+        print(f"{year:<8}{layoffs[year]:>12,}{shown:>16}")
+
+    plt.figure()
+
+    plt.plot(years, [layoffs[y] for y in years],
+             marker="o", label="Reported AI layoffs")
+
+    plt.plot(years, [float("nan") if g is None else g for g in growth],
+             marker="o", label="AI company staff change")
+
+    plt.xticks(years)
+    plt.xlabel("Year")
+    plt.ylabel("Employees")
+    plt.title("AI Layoffs vs AI Company Employment Changes")
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig("q3_comparison.png")
+    plt.show()
+    plt.close()
+
 
 
 def show_help():
