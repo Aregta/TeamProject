@@ -1,9 +1,50 @@
 import sys
-import csv
 from q2_growth import load_data, show_company, compare_companies
+from q1_layoffs import load_layoffs, get_industries, show_industries
+
 def question_1(layoffs_file):
-    # Add Q1 here: collect inputs, open/read/close the file, show results.
-    pass
+    print("\nAI Layoffs by Industry")
+
+    try:
+        data = load_layoffs(layoffs_file)
+    except FileNotFoundError:
+        print("Layoffs file not found.")
+        return
+
+    industries = get_industries(data)
+
+    print("\nAvailable industries:")
+
+    for industry in industries:
+        print("-", industry)
+
+    choice = input("\nEnter industries, separated by commas (or all): ").strip()
+
+    if choice.lower() == "all":
+        chosen = industries
+    else:
+        chosen = []
+        for typed in choice.split(","):
+            for industry in industries:
+                if typed.strip().lower() == industry.lower() and industry not in chosen:
+                    chosen.append(industry)
+
+    if len(chosen) == 0:
+        print("No matching industries.")
+        return
+
+    try:
+        start = int(input("Enter start year: "))
+        end = int(input("Enter end year: "))
+    except ValueError:
+        print("Please enter valid years.")
+        return
+
+    if start > end:
+        print("Start year cannot be greater than end year.")
+        return
+
+    show_industries(data, chosen, start, end)
 
 
 def question_2(staff_file):
@@ -43,7 +84,6 @@ def question_2(staff_file):
         compare_companies(data, start, end)
     else:
         show_company(data, company, start, end)
-    pass
 
 
 def question_3(layoffs_file, staff_file):

@@ -1,6 +1,7 @@
 
 import csv
 import argparse
+from datetime import datetime
 import matplotlib.pyplot as plt
 
 
@@ -83,7 +84,7 @@ def show_company(data, company, start, end):
     for row in reports:
         print(row[1], "   ", row[2])
 
-        dates.append(row[1])
+        dates.append(datetime.strptime(row[1], "%Y-%m-%d"))
         employees.append(row[2])
 
     first, latest, added, growth = calculate_growth(reports)
