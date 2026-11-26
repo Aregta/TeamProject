@@ -7,7 +7,42 @@ def question_1(layoffs_file):
 
 
 def question_2(staff_file):
-    # Add Q2 here: collect inputs, open/read/close the file, show results.
+    print("\nAI Company Employee Growth")
+
+    try:
+        data = load_data(staff_file)
+    except FileNotFoundError:
+        print("Staff file not found.")
+        return
+
+    companies = []
+
+    for row in data:
+        if row[0] not in companies:
+            companies.append(row[0])
+
+    print("\nAvailable companies:")
+
+    for company in companies:
+        print("-", company)
+
+    company = input("\nEnter company name (or all): ").strip()
+
+    try:
+        start = int(input("Enter start year: "))
+        end = int(input("Enter end year: "))
+    except ValueError:
+        print("Please enter valid years.")
+        return
+
+    if start > end:
+        print("Start year cannot be greater than end year.")
+        return
+
+    if company.lower() == "all":
+        compare_companies(data, start, end)
+    else:
+        show_company(data, company, start, end)
     pass
 
 
